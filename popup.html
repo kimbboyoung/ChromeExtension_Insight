@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title> 
-</head>
-<body style="width: 300px; height: 550px;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body style="width: 300px; height: 550px">
     <div id="chat-container">
       <div id="input-container">
         <input type="text" id="chat-input" placeholder="메시지를 입력하세요" />
         <button id="sendText">전송</button>
         <button id="startRecordingButton">음성 녹음 시작</button>
       </div>
+      <h2>음성답변</h2>
       <div id="messages-container"></div>
-      </div>
-    </body>
-    <script src="static/sound_script.js"></script>
+      <h2>OCR->GPT 답변</h2>
+      <div id="response-container"></div>
+    </div>
+  </body>
+  <script src="static/sound_script.js"></script>
+  <script src="static/background.js"></script>
 </html>
