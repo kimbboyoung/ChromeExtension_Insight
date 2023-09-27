@@ -19,7 +19,7 @@ async function sendAudioToPython(audioChunks) {
   formData.append('audio_file', audioBlob, 'audio.wav');
 //파이썬 서버로 오디오 파일을 보내고 응답을 받는 함수
   try {
-    const transcribeResponse = await fetch('http://192.168.0.31:8000/transcribe', {
+    const transcribeResponse = await fetch('http://localhost:8000/transcribe', {
       method: 'POST',
       body: formData
     });
@@ -27,7 +27,7 @@ async function sendAudioToPython(audioChunks) {
     const text = data.text;
     appendMessage(text, false);
 
-    const chatResponse = await fetch('http://192.168.0.31:8000/chat', {
+    const chatResponse = await fetch('http://localhost:8000/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: [{ role: 'user', content: text }] })
