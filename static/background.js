@@ -26,11 +26,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
       // Handle the response from the FastAPI server
       console.log('Response from FastAPI server:', data);
-      // <p>Summary: ${data[0].summary}</p>
       // Update the HTML element with the response data
       const responseContainer = document.getElementById('response-container');
       if (responseContainer) {
           responseContainer.innerHTML = `
+              <p>Summary: ${data[0].summary}</p>
               <p>Original Response: ${data[0].original_response}</p>
           `;
       }
