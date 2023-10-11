@@ -26,7 +26,9 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         body: JSON.stringify({
           imageUrls: formattedSrcList,
         }),
-      });
+      })
+        //ocr완료 확인용
+        .then((response) => console.log("OCR STATUS : ", response.statusText));
     } catch (error) {
       console.error("POST 요청 전송 중 오류 발생:", error);
     }
