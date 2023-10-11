@@ -5,10 +5,13 @@ function Popup() {
   const [audioChunks, setAudioChunks] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // 로딩 상태를 저장할 상태
+  //const [audioUrl, setAudioUrl] = useState(null);
 
-  const appendMessage = (content, isUser) => {
-    setMessages((prevMessages) => [...prevMessages, { content, isUser }]);
+  const appendMessage = (content, isUser, audioUrl) => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { content, isUser, audioUrl },
+    ]);
   };
 
   const handleSendButtonClick = async () => {
@@ -20,7 +23,7 @@ function Popup() {
     appendMessage(userInput, true);
 
     try {
-      //const chatResponse = await fetch("http://localhost:8000/chat", {
+      // const chatResponse = await fetch("http://localhost:8000/chat", {
       const chatResponse = await fetch("http://localhost:8000/answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,15 +32,15 @@ function Popup() {
         }),
       });
       const assistantTurn = await chatResponse.json();
-      appendMessage(assistantTurn.content, false);
+      // 구글 tts
+      const ttsURL = await fetchTextToSpeech(assistantTurn.content);
+      appendMessage(assistantTurn.content, false, ttsURL);
     } catch (error) {
       console.error("에러 발생:", error);
     }
   };
 
   const handleStartRecording = async () => {
-    setMessages([]); // 메시지 목록 초기화
-
     const updatedAudioChunks = [];
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -79,17 +82,45 @@ function Popup() {
       );
       const data = await transcribeResponse.json();
       const text = data.text;
+
       appendMessage(text, true);
-      // const chatResponse = await fetch("http://localhost:8000/chat", {
+
       const chatResponse = await fetch("http://localhost:8000/answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: [{ role: "user", content: text }] }),
       });
       const assistantTurn = await chatResponse.json();
-      appendMessage(assistantTurn.content, false);
+      // Fetch and play audio
+      const ttsURL = await fetchTextToSpeech(assistantTurn.content);
+      appendMessage(assistantTurn.content, false, ttsURL);
     } catch (error) {
       console.error("Error:", error);
+    }
+  };
+
+  // 프론트엔드에서 백엔드 엔드포인트로 POST 요청 보내기
+  const fetchTextToSpeech = async (gptText) => {
+    try {
+      const response = await fetch("http://localhost:8000/text-to-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: gptText }),
+      });
+
+      if (response.ok) {
+        // 클라이언트에서 오디오 재생
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        return audioUrl;
+        //setAudioUrl(audioUrl);
+      } else {
+        console.error("오디오 생성 요청에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("에러 발생:", error);
     }
   };
 
@@ -116,10 +147,21 @@ function Popup() {
             key={index}
             className={message.isUser ? "user-message" : "assistant-message"}
           >
-            <h3>
-              <strong>{message.isUser ? "사용자" : "어시스턴트"}:</strong>{" "}
-              {message.content}
-            </h3>
+            <strong>{message.isUser ? "사용자" : "어시스턴트"}:</strong>{" "}
+            {message.content}
+            <span>
+              {message.isUser ? null : (
+                <div>
+                  <audio
+                    controls
+                    autoPlay
+                    src={message.audioUrl}
+                    //playbackRate={2.0}
+                    //volume={0.5}
+                  ></audio>
+                </div>
+              )}
+            </span>
           </div>
         ))}
       </div>
