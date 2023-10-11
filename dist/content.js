@@ -1,0 +1,1 @@
+let srcList=[];const iframes=document.querySelectorAll("iframe");iframes.length>0&&(iframes?.forEach((e=>{try{const r=e.contentDocument;if(r){const e=r.querySelectorAll("img");srcList.push(...Array.from(e).map((e=>e.src)))}}catch(e){console.warn("Error accessing iframe contents:",e)}})),chrome.runtime.sendMessage({images:srcList},(e=>{})));
