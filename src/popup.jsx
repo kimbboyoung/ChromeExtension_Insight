@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
+import Switch from "@mui/material/Switch";
 
 function Popup() {
   const [audioChunks, setAudioChunks] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
   //const [audioUrl, setAudioUrl] = useState(null);
+  const [isOn, setIsOn] = useState(false);
+
+  const toggleSwitch = () => {
+    setIsOn(!isOn);
+  };
 
   const appendMessage = (content, isUser, audioUrl) => {
     setMessages((prevMessages) => [
@@ -142,6 +148,16 @@ function Popup() {
         </button>
       </div>
       <div id="messages-container">
+        <div>
+          <span>{isOn ? "ON" : "OFF"}</span>
+          <Switch
+            checked={isOn}
+            onChange={toggleSwitch}
+            color="primary"
+            name="toggle-switch"
+            inputProps={{ "aria-label": "toggle switch" }}
+          />
+        </div>
         {messages.map((message, index) => (
           <div
             key={index}
