@@ -1,0 +1,1 @@
+chrome.runtime.onMessage.addListener(((e,o,t)=>{if(e.images){const o=e.images.map((e=>({url:e})));console.log("백그라운드 스크립트 이미지 URL 목록:",o),fetch("http://localhost:8000/pic_to_text",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({imageUrls:o})}).catch((e=>{console.error("POST 요청 전송 중 오류 발생:",e)}))}}));
