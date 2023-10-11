@@ -7,7 +7,7 @@ function Popup() {
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
   //const [audioUrl, setAudioUrl] = useState(null);
-  const [isOn, setIsOn] = useState(false);
+  const [isOn, setIsOn] = useState(true);
 
   const toggleSwitch = () => {
     setIsOn(!isOn);
@@ -166,15 +166,9 @@ function Popup() {
             <strong>{message.isUser ? "사용자" : "어시스턴트"}:</strong>{" "}
             {message.content}
             <span>
-              {message.isUser ? null : (
+              {message.isUser || !isOn ? null : (
                 <div>
-                  <audio
-                    controls
-                    autoPlay
-                    src={message.audioUrl}
-                    //playbackRate={2.0}
-                    //volume={0.5}
-                  ></audio>
+                  <audio controls autoPlay src={message.audioUrl}></audio>
                 </div>
               )}
             </span>
