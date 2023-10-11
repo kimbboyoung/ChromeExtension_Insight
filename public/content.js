@@ -41,20 +41,20 @@ const getAllCoupangImages = () => {
 
 // content.js
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "performTask") {
-    // 페이지 로딩이 완료된 후 작업을 수행합니다.
-    setTimeout(() => {
-      getAllCoupangImages();
-      //console.log("Loading 끝");
-      //console.log("지마켓 이미지 URL", srcList);
-      //console.log("쿠팡 이미지 URL", coupangList);
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//   if (message.action === "performTask") {
+// 페이지 로딩이 완료된 후 작업을 수행합니다.
+setTimeout(() => {
+  getAllCoupangImages();
+  //console.log("Loading 끝");
+  //console.log("지마켓 이미지 URL", srcList);
+  //console.log("쿠팡 이미지 URL", coupangList);
 
-      // 이미지를 보내는 메시지를 전송
-      chrome.runtime.sendMessage(
-        { images: srcList, coupangs: coupangList },
-        (response) => {}
-      );
-    }, 2000);
-  }
-});
+  // 이미지를 보내는 메시지를 전송
+  chrome.runtime.sendMessage(
+    { images: srcList, coupangs: coupangList },
+    (response) => {}
+  );
+}, 2000);
+//   }
+// });
