@@ -22,7 +22,6 @@ function Popup() {
 
   const handleSendButtonClick = async () => {
     setMessages([]); // 메시지 목록 초기화
-
     if (userInput.trim() === "") return;
 
     // Append user message to messages
@@ -47,6 +46,7 @@ function Popup() {
   };
 
   const handleStartRecording = async () => {
+    setMessages([]);
     const updatedAudioChunks = [];
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -130,6 +130,14 @@ function Popup() {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // 기본 엔터 동작 방지
+      handleSendButtonClick();
+      setUserInput(""); // 검색 후 userInput 비우기
+    }
+  };
+
   return (
     <div id="chat-container">
       <div id="input-container">
@@ -139,6 +147,7 @@ function Popup() {
           placeholder="메시지를 입력하세요"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
+          onKeyDown={handleKeyPress}
         />
         <button id="sendText" onClick={handleSendButtonClick}>
           전송
