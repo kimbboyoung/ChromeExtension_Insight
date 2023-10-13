@@ -38,7 +38,7 @@ function Popup() {
       });
       const assistantTurn = await chatResponse.json();
       // 구글 tts
-      const ttsURL = await fetchTextToSpeech(assistantTurn.content);
+      const ttsURL = await fetchTextToSpeech(userInput + assistantTurn.content);
       appendMessage(assistantTurn.content, false, ttsURL);
     } catch (error) {
       console.error("에러 발생:", error);
@@ -158,7 +158,7 @@ function Popup() {
       </div>
       <div id="messages-container">
         <div>
-          <span>{isOn ? "ON" : "OFF"}</span>
+          <span>{isOn ? "음성 답변 켜기" : "음성 답변 끄기"}</span>
           <Switch
             checked={isOn}
             onChange={toggleSwitch}
