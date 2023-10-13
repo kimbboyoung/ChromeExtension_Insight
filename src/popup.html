@@ -7,9 +7,46 @@
     <style>
       body {
         min-width: 250px;
+        background-color: #f6eee2;
+      }
+
+      #input-container {
+        background-color: #fff;
+        border: 1px solid #d1d1d1;
+        border-radius: 2px;
+        display: flex;
+      }
+      /* input box 스타일 */
+      #chat-input {
+        border: none;
+        outline: none;
+        width: 80%;
+      }
+
+      /* 전송 버튼 스타일 */
+      #sendText {
+        padding: 6px 2px;
+        border: none;
+        border-radius: 2px;
+        background-color: #524300;
+        color: #fff;
+        cursor: pointer;
+        width: 20%;
+      }
+      #startRecordingButton {
+        padding: 0;
+        border: none;
+        background: none;
+        cursor: pointer;
+        position: relative;
+      }
+      #mic_img {
+        margin-right: 10px;
+        width: 20px;
       }
       .user-message {
-        background-color: #f3f180;
+        background-color: #f3e4cb;
+        color: black;
         padding: 10px;
         border-radius: 10px;
         margin-bottom: 10px;
@@ -20,7 +57,8 @@
 
       /* 어시스턴트 메시지 말풍선 스타일 */
       .assistant-message {
-        background-color: #82c082;
+        background-color: #edd09b;
+        color: black;
         padding: 10px;
         border-radius: 10px;
         margin-bottom: 10px;

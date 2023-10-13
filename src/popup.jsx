@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import Switch from "@mui/material/Switch";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function Popup() {
   const [audioChunks, setAudioChunks] = useState([]);
@@ -8,7 +9,8 @@ function Popup() {
   const [messages, setMessages] = useState([]);
   //const [audioUrl, setAudioUrl] = useState(null);
   const [isOn, setIsOn] = useState(true);
-
+  const [progress, setProgress] = useState(0);
+  const [showProgress, setShowProgress] = useState(false); // 프로그레스 바 숨기기
   const toggleSwitch = () => {
     setIsOn(!isOn);
   };
@@ -47,6 +49,7 @@ function Popup() {
 
   const handleStartRecording = async () => {
     setMessages([]);
+
     const updatedAudioChunks = [];
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -63,10 +66,25 @@ function Popup() {
       };
 
       mediaRecorder.start();
+      setShowProgress(true); // 프로그레스 바 표시
+      setProgress(0); // 프로그레스 바 표시
       console.log("녹음을 시작합니다...");
+
+      // 프로그레스 바 증가 로직
+      const interval = setInterval(() => {
+        setProgress((prevProgress) => {
+          const newProgress = prevProgress + 100 / (5000 / 20);
+          if (newProgress >= 100) {
+            clearInterval(interval);
+            return 100; // 끝났을 때 100으로 설정
+          }
+          return newProgress;
+        });
+      }, 0); // 프로그레스 바 갱신 간격
 
       setTimeout(() => {
         mediaRecorder.stop();
+        setShowProgress(false); // 프로그레스 바 숨기기
         console.log("녹음이 중지되었습니다.");
       }, 5000); // 5초 후에 녹음 중지
     } catch (error) {
@@ -149,11 +167,14 @@ function Popup() {
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={handleKeyPress}
         />
-        <button id="sendText" onClick={handleSendButtonClick}>
-          전송
-        </button>
         <button id="startRecordingButton" onClick={handleStartRecording}>
-          음성 녹음 시작
+          <img src="free-icon-mic-772150.png" alt="음성 검색" id="mic_img" />
+          {showProgress && (
+            <CircularProgress variant="determinate" value={progress} />
+          )}
+        </button>
+        <button id="sendText" onClick={handleSendButtonClick}>
+          검색
         </button>
       </div>
       <div id="messages-container">
@@ -187,49 +208,5 @@ function Popup() {
     </div>
   );
 }
-
-//    // 백그라운드 스크립트에서 이미지 URL 목록을 수신
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   //console.log(request);
-//   if (request.images) {
-//     const srcList = request.images;
-//     const formattedSrcList = srcList.map(url => ({ url }));
-
-//     // 백그라운드 스크립트에서 이미지 URL 목록을 처리
-//     console.log("백그라운드 스크립트 이미지 URL 목록:",formattedSrcList
-//     );
-//     // Make an HTTP POST request to your FastAPI server
-//   fetch('http://localhost:8000/pic_to_text', {
-//       method: 'POST',
-//       headers: {
-//           'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({
-//           imageUrls: formattedSrcList, // Send the list of image URLs in the request body
-//       }),
-//   })
-//   .then(response => response.json())
-//   .then(data => {
-//     if (data.detail) {
-//       console.error('Server returned an error:', data.detail);
-//       return;
-//     }
-//     // Handle the response from the FastAPI server
-//     console.log('Response from FastAPI server:', data);
-//     // Update the HTML element with the response data
-//     const responseContainer = document.getElementById('response-container');
-//     if (responseContainer) {
-//         responseContainer.innerHTML = `
-//             <p>Summary: ${data[0].summary}</p>
-//             <p>Original Response: ${data[0].original_response}</p>
-//         `;
-//     }
-//   })
-
-//   .catch(error => {
-//       console.error('Error sending POST request:', error);
-//   });
-//   }
-// });
 
 createRoot(document.getElementById("react-target")).render(<Popup />);
