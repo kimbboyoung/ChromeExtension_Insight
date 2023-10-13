@@ -37,8 +37,9 @@ function Popup() {
         }),
       });
       const assistantTurn = await chatResponse.json();
+
       // 구글 tts
-      const ttsURL = await fetchTextToSpeech(userInput + assistantTurn.content);
+      const ttsURL = await fetchTextToSpeech(assistantTurn.content, userInput);
       appendMessage(assistantTurn.content, false, ttsURL);
     } catch (error) {
       console.error("에러 발생:", error);
@@ -106,14 +107,17 @@ function Popup() {
   };
 
   // 프론트엔드에서 백엔드 엔드포인트로 POST 요청 보내기
-  const fetchTextToSpeech = async (gptText) => {
+  const fetchTextToSpeech = async (gptText, userText) => {
     try {
       const response = await fetch("http://localhost:8000/text-to-speech", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: gptText }),
+        body: JSON.stringify({
+          assistant: gptText,
+          user: userText,
+        }),
       });
 
       if (response.ok) {
