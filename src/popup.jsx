@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import Switch from "@mui/material/Switch";
 import CircularProgress from "@mui/material/CircularProgress";
+import Slider from "@mui/material/Slider";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
 
 function Popup() {
   const [audioChunks, setAudioChunks] = useState([]);
@@ -11,6 +14,25 @@ function Popup() {
   const [isOn, setIsOn] = useState(true);
   const [progress, setProgress] = useState(0);
   const [showProgress, setShowProgress] = useState(false); // 프로그레스 바 숨기기
+  //소리 크기, 속도 조절
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [audioVolume, setAudioVolume] = useState("50%"); // 초기값으로 50 설정
+  const [audioSpeed, setAudioSpeed] = useState("0dB"); // 초기값으로 1 설정
+
+  const toggleSettings = () => {
+    setIsSettingsOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleVolumeChange = (event, newValue) => {
+    console.log("volume change", newValue);
+    setAudioVolume(newValue);
+  };
+
+  const handleSpeedChange = (event, newValue) => {
+    console.log("speed change", newValue);
+    setAudioSpeed(newValue);
+  };
+
   const toggleSwitch = () => {
     setIsOn(!isOn);
   };
@@ -39,8 +61,9 @@ function Popup() {
         }),
       });
       const assistantTurn = await chatResponse.json();
+
       // 구글 tts
-      const ttsURL = await fetchTextToSpeech(userInput + assistantTurn.content);
+      const ttsURL = await fetchTextToSpeech(assistantTurn.content, userInput);
       appendMessage(assistantTurn.content, false, ttsURL);
     } catch (error) {
       console.error("에러 발생:", error);
@@ -116,7 +139,7 @@ function Popup() {
       });
       const assistantTurn = await chatResponse.json();
       // Fetch and play audio
-      const ttsURL = await fetchTextToSpeech(assistantTurn.content);
+      const ttsURL = await fetchTextToSpeech(assistantTurn.content, "");
       appendMessage(assistantTurn.content, false, ttsURL);
     } catch (error) {
       console.error("Error:", error);
@@ -124,14 +147,17 @@ function Popup() {
   };
 
   // 프론트엔드에서 백엔드 엔드포인트로 POST 요청 보내기
-  const fetchTextToSpeech = async (gptText) => {
+  const fetchTextToSpeech = async (gptText, userText) => {
     try {
       const response = await fetch("http://localhost:8000/text-to-speech", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: gptText }),
+        body: JSON.stringify({
+          assistant: gptText,
+          user: userText,
+        }),
       });
 
       if (response.ok) {
@@ -187,6 +213,38 @@ function Popup() {
             name="toggle-switch"
             inputProps={{ "aria-label": "toggle switch" }}
           />
+          <button onClick={toggleSettings}>
+            {isSettingsOpen ? "닫기" : "설정"}
+          </button>
+          {isSettingsOpen && (
+            <div>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Typography id="audio-volume-slider" gutterBottom>
+                    소리 크기
+                  </Typography>
+                  <Slider
+                    value={audioVolume}
+                    onChange={handleVolumeChange}
+                    aria-labelledby="audio-volume-slider"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography id="audio-speed-slider" gutterBottom>
+                    속도
+                  </Typography>
+                  <Slider
+                    value={audioSpeed}
+                    onChange={handleSpeedChange}
+                    aria-labelledby="audio-speed-slider"
+                    step={0.1}
+                    min={0.5}
+                    max={2}
+                  />
+                </Grid>
+              </Grid>
+            </div>
+          )}
         </div>
         {messages.map((message, index) => (
           <div
@@ -198,7 +256,13 @@ function Popup() {
             <span>
               {message.isUser || !isOn ? null : (
                 <div>
-                  <audio controls autoPlay src={message.audioUrl}></audio>
+                  <audio
+                    controls
+                    autoPlay
+                    speed={audioSpeed}
+                    soundLevel={audioVolume}
+                    src={message.audioUrl}
+                  ></audio>
                 </div>
               )}
             </span>
