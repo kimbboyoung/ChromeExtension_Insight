@@ -52,7 +52,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         body: JSON.stringify({
           imageUrls: formattedSrcList,
           productTexts: request.detailTexts,
-          sietUrls: request.currentURL,
+          siteUrls: request.currentURL,
         }),
       })
         //ocr완료 확인용
