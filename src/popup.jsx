@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import Switch from "@mui/material/Switch";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -18,6 +18,8 @@ function Popup() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [audioVolume, setAudioVolume] = useState("50%"); // 초기값으로 50 설정
   const [audioSpeed, setAudioSpeed] = useState("0dB"); // 초기값으로 1 설정
+  const [isOcrInProgress, setIsOcrInProgress] = useState(false);
+  const [ocrCompleted, setOcrCompleted] = useState(false);
 
   const toggleSettings = () => {
     setIsSettingsOpen((prevOpen) => !prevOpen);
@@ -43,6 +45,28 @@ function Popup() {
       { content, isUser, audioUrl },
     ]);
   };
+  //OCR시작시 알림음실행
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.type === "ocrInProgress") {
+        setIsOcrInProgress(true);
+        const waitnotificationSound = new Audio("OCR_start.mp3");
+        waitnotificationSound.play();
+      } else if (message.type === "ocrCompleted") {
+        setIsOcrInProgress(false);
+        setOcrCompleted(true);
+        const notificationSound = new Audio("20231016064020111.mp3");
+        notificationSound.play();
+      }
+    });
+  }, []);
+  //OCR완료시 알림음실행
+  // useEffect(() => {
+  //   if (ocrCompleted) {
+  //     const notificationSound = new Audio("20231016064020111.mp3");
+  //     notificationSound.play();
+  //   }
+  // }, [ocrCompleted]);
 
   const handleSendButtonClick = async () => {
     setMessages([]); // 메시지 목록 초기화
@@ -96,14 +120,14 @@ function Popup() {
       // 프로그레스 바 증가 로직
       const interval = setInterval(() => {
         setProgress((prevProgress) => {
-          const newProgress = prevProgress + 100 / (5000 / 20);
+          const newProgress = prevProgress + 100 / (5000 / 100);
           if (newProgress >= 100) {
             clearInterval(interval);
             return 100; // 끝났을 때 100으로 설정
           }
           return newProgress;
         });
-      }, 0); // 프로그레스 바 갱신 간격
+      }, 100); // 프로그레스 바 갱신 간격
 
       setTimeout(() => {
         mediaRecorder.stop();
@@ -184,91 +208,115 @@ function Popup() {
 
   return (
     <div id="chat-container">
-      <div id="input-container">
-        <input
-          type="text"
-          id="chat-input"
-          placeholder="메시지를 입력하세요"
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          onKeyDown={handleKeyPress}
-        />
-        <button id="startRecordingButton" onClick={handleStartRecording}>
-          <img src="free-icon-mic-772150.png" alt="음성 검색" id="mic_img" />
-          {showProgress && (
-            <CircularProgress variant="determinate" value={progress} />
-          )}
-        </button>
-        <button id="sendText" onClick={handleSendButtonClick}>
-          검색
-        </button>
-      </div>
-      <div id="messages-container">
+      {isOcrInProgress && !ocrCompleted && (
         <div>
-          <span>{isOn ? "음성 답변 켜기" : "음성 답변 끄기"}</span>
-          <Switch
-            checked={isOn}
-            onChange={toggleSwitch}
-            color="primary"
-            name="toggle-switch"
-            inputProps={{ "aria-label": "toggle switch" }}
-          />
-          <button onClick={toggleSettings}>
-            {isSettingsOpen ? "닫기" : "설정"}
-          </button>
-          {isSettingsOpen && (
-            <div>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography id="audio-volume-slider" gutterBottom>
-                    소리 크기
-                  </Typography>
-                  <Slider
-                    value={audioVolume}
-                    onChange={handleVolumeChange}
-                    aria-labelledby="audio-volume-slider"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography id="audio-speed-slider" gutterBottom>
-                    속도
-                  </Typography>
-                  <Slider
-                    value={audioSpeed}
-                    onChange={handleSpeedChange}
-                    aria-labelledby="audio-speed-slider"
-                    step={0.1}
-                    min={0.5}
-                    max={2}
-                  />
-                </Grid>
-              </Grid>
-            </div>
-          )}
+          <h2>이미지를 분석 중입니다. 잠시만 기다려주세요.</h2>
         </div>
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={message.isUser ? "user-message" : "assistant-message"}
-          >
-            <strong>{message.isUser ? "사용자" : "어시스턴트"}:</strong>{" "}
-            {message.content}
-            <span>
-              {message.isUser || !isOn ? null : (
+      )}
+      {ocrCompleted && (
+        <div>
+          <div id="input-container">
+            <input
+              type="text"
+              id="chat-input"
+              placeholder="메시지를 입력하세요"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              onKeyDown={handleKeyPress}
+            />
+            <button id="startRecordingButton" onClick={handleStartRecording}>
+              {showProgress && (
+                <CircularProgress
+                  variant="determinate"
+                  value={progress}
+                  style={{
+                    position: "absolute",
+                    left: "0",
+                    width: "22px",
+                    height: "22px",
+                  }}
+                />
+              )}
+              <img
+                src="free-icon-mic-772150.png"
+                alt="음성 검색"
+                id="mic_img"
+              />
+            </button>
+            <button id="sendText" onClick={handleSendButtonClick}>
+              검색
+            </button>
+          </div>
+          <div id="messages-container">
+            <div>
+              <span>{isOn ? "음성 답변 켜기" : "음성 답변 끄기"}</span>
+              <Switch
+                checked={isOn}
+                onChange={toggleSwitch}
+                color="primary"
+                name="toggle-switch"
+                inputProps={{ "aria-label": "toggle switch" }}
+              />
+              <button onClick={toggleSettings}>
+                {isSettingsOpen ? "닫기" : "설정"}
+              </button>
+              {isSettingsOpen && (
                 <div>
-                  <audio
-                    controls
-                    autoPlay
-                    speed={audioSpeed}
-                    soundLevel={audioVolume}
-                    src={message.audioUrl}
-                  ></audio>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <Typography id="audio-volume-slider" gutterBottom>
+                        소리 크기
+                      </Typography>
+                      <Slider
+                        value={audioVolume}
+                        onChange={handleVolumeChange}
+                        aria-labelledby="audio-volume-slider"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography id="audio-speed-slider" gutterBottom>
+                        속도
+                      </Typography>
+                      <Slider
+                        value={audioSpeed}
+                        onChange={handleSpeedChange}
+                        aria-labelledby="audio-speed-slider"
+                        step={0.1}
+                        min={0.5}
+                        max={2}
+                      />
+                    </Grid>
+                  </Grid>
                 </div>
               )}
-            </span>
+            </div>
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={
+                  message.isUser ? "user-message" : "assistant-message"
+                }
+              >
+                <strong>{message.isUser ? "사용자" : "어시스턴트"}:</strong>{" "}
+                {message.content}
+                <span>
+                  {message.isUser || !isOn ? null : (
+                    <div>
+                      <audio
+                        controls
+                        autoPlay
+                        speed={audioSpeed}
+                        soundLevel={audioVolume}
+                        src={message.audioUrl}
+                      ></audio>
+                    </div>
+                  )}
+                </span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
