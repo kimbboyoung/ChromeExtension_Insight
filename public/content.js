@@ -17,6 +17,7 @@ const getAllCoupangImages = () => {
   if (iframes.length > 0) {
     for (let i = 0; i < iframes.length; i++) {
       const iframe = iframes[i];
+      //console.log("iframe : ", iframe);
       try {
         const contentDoc = iframe.contentDocument;
         if (contentDoc) {
@@ -91,10 +92,10 @@ const getAllCoupangImages = () => {
     //const rewardCashText = combinedRewardsText.textContent.trim();
 
     // 이제 h2Text, totalPriceText, shippingFeeText, rewardCashText에 원하는 텍스트가 들어있습니다.
-    console.log("h2Text:", h2Text);
-    console.log("totalPriceText:", totalPriceText);
-    console.log("shippingFeeText:", shippingFeeText);
-    console.log("combinedRewardsText:", combinedRewardsText);
+    //console.log("h2Text:", h2Text);
+    //console.log("totalPriceText:", totalPriceText);
+    //console.log("shippingFeeText:", shippingFeeText);
+    //console.log("combinedRewardsText:", combinedRewardsText);
 
     // 텍스트를 줄바꿈 문자('\n')로 연결
     combinedText = [
@@ -103,7 +104,7 @@ const getAllCoupangImages = () => {
       shippingFeeText,
       combinedRewardsText,
     ].join("\n");
-    console.log("combinedText:", combinedText);
+    //console.log("combinedText:", combinedText);
   }
 
   // 크롤링 데이터를 수집한 후 플래그를 설정
@@ -113,7 +114,7 @@ const getAllCoupangImages = () => {
 // 현재 페이지의 URL 가져오기
 const currentURL = window.location.href;
 
-console.log("현재 페이지 URL:", currentURL);
+//console.log("현재 페이지 URL:", currentURL);
 
 // content.js
 

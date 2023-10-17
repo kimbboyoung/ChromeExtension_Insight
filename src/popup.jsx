@@ -213,9 +213,9 @@ function Popup() {
             name="toggle-switch"
             inputProps={{ "aria-label": "toggle switch" }}
           />
-          <button onClick={toggleSettings}>
-            {isSettingsOpen ? "닫기" : "설정"}
-          </button>
+          <span id="settingIcon" onClick={toggleSettings}>
+            <img src="settingIcon.png" alt="음성 설정" />
+          </span>
           {isSettingsOpen && (
             <div>
               <Grid container spacing={2}>
