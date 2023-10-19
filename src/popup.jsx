@@ -16,8 +16,8 @@ function Popup() {
   const [showProgress, setShowProgress] = useState(false); // 프로그레스 바 숨기기
   //소리 크기, 속도 조절
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [audioVolume, setAudioVolume] = useState("50%"); // 초기값으로 50 설정
-  const [audioSpeed, setAudioSpeed] = useState("0dB"); // 초기값으로 1 설정
+  const [audioVolume, setAudioVolume] = useState(50); // 초기값으로 50 설정
+  const [audioSpeed, setAudioSpeed] = useState(100); // 초기값으로 1 설정
   const [isOcrInProgress, setIsOcrInProgress] = useState(false);
   const [ocrCompleted, setOcrCompleted] = useState(false);
 
@@ -179,8 +179,14 @@ function Popup() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          assistant: gptText,
-          user: userText,
+          text_request: {
+            assistant: gptText,
+            user: userText,
+          },
+          audio_config: {
+            volume: -10.0,
+            speed: 1.26,
+          },
         }),
       });
 
@@ -261,32 +267,30 @@ function Popup() {
                 <img src="settingIcon.png" alt="음성 설정" />
               </span>
               {isSettingsOpen && (
-                <div>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <Typography id="audio-volume-slider" gutterBottom>
-                        소리 크기
-                      </Typography>
-                      <Slider
-                        value={audioVolume}
-                        onChange={handleVolumeChange}
-                        aria-labelledby="audio-volume-slider"
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography id="audio-speed-slider" gutterBottom>
-                        속도
-                      </Typography>
-                      <Slider
-                        value={audioSpeed}
-                        onChange={handleSpeedChange}
-                        aria-labelledby="audio-speed-slider"
-                        step={0.1}
-                        min={0.5}
-                        max={2}
-                      />
-                    </Grid>
-                  </Grid>
+                <div className="setting-container">
+                  <div className="sound-controller">
+                    <Typography id="audio-volume-slider" gutterBottom>
+                      음성 답변 소리 조절
+                    </Typography>
+                    <Slider
+                      value={audioVolume}
+                      onChange={handleVolumeChange}
+                      aria-labelledby="audio-volume-slider"
+                    />
+                  </div>
+                  <div className="speed-controller">
+                    <Typography id="audio-speed-slider" gutterBottom>
+                      음성 답변 속도 조절
+                    </Typography>
+                    <Slider
+                      value={audioSpeed}
+                      onChange={handleSpeedChange}
+                      aria-labelledby="audio-speed-slider"
+                      step={0.1}
+                      min={0.5}
+                      max={2}
+                    />
+                  </div>
                 </div>
               )}
             </div>
