@@ -16,21 +16,23 @@ function Popup() {
   const [showProgress, setShowProgress] = useState(false); // 프로그레스 바 숨기기
   //소리 크기, 속도 조절
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [audioVolume, setAudioVolume] = useState(50); // 초기값으로 50 설정
-  const [audioSpeed, setAudioSpeed] = useState(100); // 초기값으로 1 설정
+  const [audioVolume, setAudioVolume] = useState(0); // 초기값으로 50 설정
+  const [audioSpeed, setAudioSpeed] = useState(1.25); // 초기값으로 1 설정
   const [isOcrInProgress, setIsOcrInProgress] = useState(false);
   const [ocrCompleted, setOcrCompleted] = useState(false);
-
+  //답변 보낼 때 보낼 url
+  const [currentUrl, setCurrentUrl] = useState("");
+  console.log("!!!!!currentUrl=====", currentUrl);
   const toggleSettings = () => {
     setIsSettingsOpen((prevOpen) => !prevOpen);
   };
 
-  const handleVolumeChange = (event, newValue) => {
+  const handleVolumeChange = (newValue) => {
     console.log("volume change", newValue);
     setAudioVolume(newValue);
   };
 
-  const handleSpeedChange = (event, newValue) => {
+  const handleSpeedChange = (newValue) => {
     console.log("speed change", newValue);
     setAudioSpeed(newValue);
   };
@@ -60,6 +62,15 @@ function Popup() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener((url) => {
+      if (url.currentURL) {
+        setCurrentUrl(url?.currentURL);
+      }
+    });
+  }, []);
+
   //OCR완료시 알림음실행
   // useEffect(() => {
   //   if (ocrCompleted) {
@@ -82,6 +93,7 @@ function Popup() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [{ role: "user", content: userInput }],
+          currentURL: currentUrl,
         }),
       });
       const assistantTurn = await chatResponse.json();
@@ -159,7 +171,10 @@ function Popup() {
       const chatResponse = await fetch("http://localhost:8000/answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [{ role: "user", content: text }] }),
+        body: JSON.stringify({
+          messages: [{ role: "user", content: text }],
+          currentURL: currentUrl,
+        }),
       });
       const assistantTurn = await chatResponse.json();
       // Fetch and play audio
@@ -184,8 +199,8 @@ function Popup() {
             user: userText,
           },
           audio_config: {
-            volume: -10.0,
-            speed: 1.26,
+            volume: audioVolume,
+            speed: audioSpeed,
           },
         }),
       });
@@ -273,9 +288,16 @@ function Popup() {
                       음성 답변 소리 조절
                     </Typography>
                     <Slider
-                      value={audioVolume}
-                      onChange={handleVolumeChange}
+                      //value={audioVolume}
+                      // onChange={handleVolumeChange}
                       aria-labelledby="audio-volume-slider"
+                      defaultValue={0}
+                      getAriaValueText={handleVolumeChange}
+                      valueLabelDisplay="auto"
+                      step={1}
+                      marks
+                      min={-10}
+                      max={10}
                     />
                   </div>
                   <div className="speed-controller">
@@ -283,12 +305,16 @@ function Popup() {
                       음성 답변 속도 조절
                     </Typography>
                     <Slider
-                      value={audioSpeed}
-                      onChange={handleSpeedChange}
+                      //value={audioSpeed}
+                      // onChange={handleSpeedChange}
                       aria-labelledby="audio-speed-slider"
-                      step={0.1}
-                      min={0.5}
-                      max={2}
+                      defaultValue={1.25}
+                      getAriaValueText={handleSpeedChange}
+                      valueLabelDisplay="auto"
+                      step={0.25}
+                      marks
+                      min={0.25}
+                      max={4.0}
                     />
                   </div>
                 </div>
