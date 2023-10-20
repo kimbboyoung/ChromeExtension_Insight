@@ -93,7 +93,7 @@ function Popup() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [{ role: "user", content: userInput }],
-          currentURL: currentUrl,
+          siteUrls: currentUrl,
         }),
       });
       const assistantTurn = await chatResponse.json();
@@ -173,7 +173,7 @@ function Popup() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [{ role: "user", content: text }],
-          currentURL: currentUrl,
+          siteUrls: currentUrl,
         }),
       });
       const assistantTurn = await chatResponse.json();
