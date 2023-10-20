@@ -91,12 +91,6 @@ const getAllCoupangImages = () => {
     const shippingFeeText = shippingFeeElement.textContent.trim();
     //const rewardCashText = combinedRewardsText.textContent.trim();
 
-    // 이제 h2Text, totalPriceText, shippingFeeText, rewardCashText에 원하는 텍스트가 들어있습니다.
-    //console.log("h2Text:", h2Text);
-    //console.log("totalPriceText:", totalPriceText);
-    //console.log("shippingFeeText:", shippingFeeText);
-    //console.log("combinedRewardsText:", combinedRewardsText);
-
     // 텍스트를 줄바꿈 문자('\n')로 연결
     combinedText = [
       h2Text,
@@ -104,7 +98,7 @@ const getAllCoupangImages = () => {
       shippingFeeText,
       combinedRewardsText,
     ].join("\n");
-    //console.log("combinedText:", combinedText);
+    console.log("combinedText:", combinedText);
   }
 
   // 크롤링 데이터를 수집한 후 플래그를 설정
@@ -114,23 +108,9 @@ const getAllCoupangImages = () => {
 // 현재 페이지의 URL 가져오기
 const currentURL = window.location.href;
 
-//console.log("현재 페이지 URL:", currentURL);
-
-// content.js
-
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//   if (message.action === "performTask") {
-//페이지 로딩이 완료된 후 작업을 수행합니다.
-// 페이지 로딩이 완료된 후 크롤링 함수 실행
-
-//window.addEventListener("load", getAllCoupangImages);
 setTimeout(() => {
   // 크롤링 작업을 한 번만 수행
   getAllCoupangImages();
-
-  //console.log("Loading 끝");
-  //console.log("지마켓 이미지 URL", srcList);
-  //console.log("쿠팡 이미지 URL", coupangList);
 
   // 메시지를 보내기
   sendCrawledDataToBackground();
@@ -147,5 +127,3 @@ const sendCrawledDataToBackground = () => {
     detailTexts: combinedText,
   });
 };
-//   }
-// });

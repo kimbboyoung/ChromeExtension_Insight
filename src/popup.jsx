@@ -5,6 +5,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import { alpha, styled } from "@mui/material/styles";
+import { brown } from "@mui/material/colors"; // 갈색색상 추가
 
 function Popup() {
   const [audioChunks, setAudioChunks] = useState([]);
@@ -22,11 +24,33 @@ function Popup() {
   const [ocrCompleted, setOcrCompleted] = useState(false);
   //답변 보낼 때 보낼 url
   const [currentUrl, setCurrentUrl] = useState("");
-  console.log("!!!!!currentUrl=====", currentUrl);
   const toggleSettings = () => {
     setIsSettingsOpen((prevOpen) => !prevOpen);
   };
+  const toggleSwitch = () => {
+    setIsOn(!isOn);
+  };
 
+  const BrownSwitch = styled(Switch)(({ theme }) => ({
+    "& .MuiSwitch-switchBase.Mui-checked": {
+      color: brown[400], // 갈색색상
+      "&:hover": {
+        backgroundColor: alpha(brown[400], theme.palette.action.hoverOpacity),
+      },
+    },
+    "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+      backgroundColor: brown[400], // 갈색색상
+    },
+  }));
+
+  const appendMessage = (content, isUser, audioUrl) => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { content, isUser, audioUrl },
+    ]);
+  };
+
+  //음성 답변 크기, 속도 조절하기
   const handleVolumeChange = (newValue) => {
     console.log("volume change", newValue);
     setAudioVolume(newValue);
@@ -37,16 +61,6 @@ function Popup() {
     setAudioSpeed(newValue);
   };
 
-  const toggleSwitch = () => {
-    setIsOn(!isOn);
-  };
-
-  const appendMessage = (content, isUser, audioUrl) => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { content, isUser, audioUrl },
-    ]);
-  };
   //OCR시작시 알림음실행
   useEffect(() => {
     chrome.runtime.onMessage.addListener((message) => {
@@ -271,10 +285,9 @@ function Popup() {
           <div id="messages-container">
             <div>
               <span>{isOn ? "음성 답변 켜기" : "음성 답변 끄기"}</span>
-              <Switch
+              <BrownSwitch
                 checked={isOn}
                 onChange={toggleSwitch}
-                color="primary"
                 name="toggle-switch"
                 inputProps={{ "aria-label": "toggle switch" }}
               />
@@ -294,10 +307,10 @@ function Popup() {
                       defaultValue={0}
                       getAriaValueText={handleVolumeChange}
                       valueLabelDisplay="auto"
-                      step={1}
+                      step={3}
                       marks
-                      min={-10}
-                      max={10}
+                      min={-9}
+                      max={9}
                     />
                   </div>
                   <div className="speed-controller">
@@ -313,8 +326,8 @@ function Popup() {
                       valueLabelDisplay="auto"
                       step={0.25}
                       marks
-                      min={0.25}
-                      max={4.0}
+                      min={0.5}
+                      max={3.0}
                     />
                   </div>
                 </div>
