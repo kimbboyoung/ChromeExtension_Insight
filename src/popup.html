@@ -8,12 +8,19 @@
       body {
         min-width: 250px;
         background-color: #f6eee2;
+        font-family: "Apple SD Gothic Neo", sans-serif;
+        width: 500px;
+        height: 500px;
+        padding: 20px;
+      }
+      h2 {
+        text-align: center;
       }
 
       #input-container {
         background-color: #fff;
-        border: 1px solid #d1d1d1;
-        border-radius: 2px;
+        border: 2px solid #412e12;
+        border-radius: 27px;
         display: flex;
       }
       /* input box 스타일 */
@@ -21,6 +28,11 @@
         border: none;
         outline: none;
         width: 80%;
+        border-radius: 27px;
+        text-indent: 15px;
+      }
+      #chat-input::placeholder {
+        color: rgb(163, 163, 163);
       }
 
       /* 전송 버튼 스타일 */
@@ -28,9 +40,10 @@
         padding: 6px 2px;
         border: none;
         border-radius: 2px;
-        background-color: #524300;
+        background-color: #412e12;
         color: #fff;
         cursor: pointer;
+        border-radius: 27px;
         width: 20%;
       }
       #startRecordingButton {
@@ -68,18 +81,35 @@
         max-width: 70%; /* 최대 너비 설정 */
         float: right;
         clear: both;
+        font-size: medium;
       }
 
       /* 어시스턴트 메시지 말풍선 스타일 */
       .assistant-message {
         background-color: #edd09b;
-        color: black;
+        color: #000000;
         padding: 10px;
         border-radius: 10px;
         margin-bottom: 10px;
         max-width: 70%; /* 최대 너비 설정 */
         float: left;
         clear: both;
+        font-size: medium;
+      }
+      .loader {
+        background-color: #edd09b;
+        color: #ededed;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        max-width: 70%; /* 최대 너비 설정 */
+        float: left;
+        clear: both;
+      }
+      .loader-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
       audio {
         width: 100%;

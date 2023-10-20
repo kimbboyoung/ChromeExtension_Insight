@@ -5,6 +5,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import { BeatLoader, GridLoader } from "react-spinners";
 
 function Popup() {
   const [audioChunks, setAudioChunks] = useState([]);
@@ -20,6 +21,7 @@ function Popup() {
   const [audioSpeed, setAudioSpeed] = useState("0dB"); // 초기값으로 1 설정
   const [isOcrInProgress, setIsOcrInProgress] = useState(false);
   const [ocrCompleted, setOcrCompleted] = useState(false);
+  const [loading, setLoading] = useState(false); // 로딩 상태를 관리하는 state
 
   const toggleSettings = () => {
     setIsSettingsOpen((prevOpen) => !prevOpen);
@@ -74,7 +76,7 @@ function Popup() {
 
     // Append user message to messages
     appendMessage(userInput, true);
-
+    setLoading(true);
     try {
       // const chatResponse = await fetch("http://localhost:8000/chat", {
       const chatResponse = await fetch("http://localhost:8000/answer", {
@@ -88,6 +90,7 @@ function Popup() {
 
       // 구글 tts
       const ttsURL = await fetchTextToSpeech(assistantTurn.content, userInput);
+      setLoading(false);
       appendMessage(assistantTurn.content, false, ttsURL);
     } catch (error) {
       console.error("에러 발생:", error);
@@ -155,7 +158,7 @@ function Popup() {
       const text = data.text;
 
       appendMessage(text, true);
-
+      setLoading(true);
       const chatResponse = await fetch("http://localhost:8000/answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -164,6 +167,7 @@ function Popup() {
       const assistantTurn = await chatResponse.json();
       // Fetch and play audio
       const ttsURL = await fetchTextToSpeech(assistantTurn.content, "");
+      setLoading(false);
       appendMessage(assistantTurn.content, false, ttsURL);
     } catch (error) {
       console.error("Error:", error);
@@ -211,6 +215,9 @@ function Popup() {
       {isOcrInProgress && !ocrCompleted && (
         <div>
           <h2>이미지를 분석 중입니다. 잠시만 기다려주세요.</h2>
+          <div className="loader-container">
+            <GridLoader color="#1976d2" margin={6} size={20} />
+          </div>
         </div>
       )}
       {ocrCompleted && (
@@ -253,7 +260,7 @@ function Popup() {
               <Switch
                 checked={isOn}
                 onChange={toggleSwitch}
-                color="primary"
+                style={{ color: "brown" }} // 이 부분에서 스위치의 색상을 설정합니다
                 name="toggle-switch"
                 inputProps={{ "aria-label": "toggle switch" }}
               />
@@ -314,6 +321,11 @@ function Popup() {
                 </span>
               </div>
             ))}
+            {loading ? ( // 사용자 메시지일 때만 로딩 표시
+              <div className="loader">
+                <BeatLoader color="#ffffff" loading={loading} />
+              </div>
+            ) : null}
           </div>
         </div>
       )}
