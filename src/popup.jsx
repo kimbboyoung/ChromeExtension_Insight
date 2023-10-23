@@ -232,7 +232,9 @@ function Popup() {
       {isOcrInProgress && !ocrCompleted && (
         <div>
           <h2>이미지를 분석 중입니다. 잠시만 기다려주세요.</h2>
-          <GridLoader color="#1976d2" margin={6} size={20} />
+          <div className="loader-container">
+            <GridLoader color="#1976d2" margin={6} size={20} />
+          </div>
         </div>
       )}
       {ocrCompleted && (
@@ -345,6 +347,11 @@ function Popup() {
                 </span>
               </div>
             ))}
+            {loading ? ( // 사용자 메시지일 때만 로딩 표시
+              <div className="loader">
+                <BeatLoader color="#ffffff" loading={loading} />
+              </div>
+            ) : null}
           </div>
         </div>
       )}
