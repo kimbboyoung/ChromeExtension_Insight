@@ -82,7 +82,7 @@ function Popup() {
   const handleSendButtonClick = async () => {
     setMessages([]); // 메시지 목록 초기화
     if (userInput.trim() === "") return;
-
+    setUserInput(""); // 검색 후 userInput 비우기
     // Append user message to messages
     appendMessage(userInput, true);
 
@@ -232,6 +232,7 @@ function Popup() {
       {isOcrInProgress && !ocrCompleted && (
         <div>
           <h2>이미지를 분석 중입니다. 잠시만 기다려주세요.</h2>
+          <GridLoader color="#1976d2" margin={6} size={20} />
         </div>
       )}
       {ocrCompleted && (
