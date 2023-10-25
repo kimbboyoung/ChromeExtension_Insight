@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import Switch from "@mui/material/Switch";
+import MuiSlider, { SliderThumb } from "@mui/material/Slider";
 import CircularProgress from "@mui/material/CircularProgress";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-import { alpha, styled } from "@mui/material/styles";
+import { alpha, styled, withStyles } from "@mui/material/styles";
 import { brown } from "@mui/material/colors"; // 갈색색상 추가
 
 function Popup() {
@@ -31,6 +32,7 @@ function Popup() {
     setIsOn(!isOn);
   };
 
+  //Mui 스위치 갈색으로 변경
   const BrownSwitch = styled(Switch)(({ theme }) => ({
     "& .MuiSwitch-switchBase.Mui-checked": {
       color: brown[400], // 갈색색상
@@ -43,6 +45,24 @@ function Popup() {
     },
   }));
 
+  // Mui Slider 갈색으로 변경
+  const BrownSlider = styled(Slider)(({ theme }) => ({
+    "& .MuiSlider-track": {
+      border: "none",
+      backgroundColor: brown[400],
+    },
+    "& .MuiSlider-thumb": {
+      backgroundColor: brown[400],
+      "&:hover": {
+        backgroundColor: "#F7EEE2", // hover 시 원하는 색상으로 변경
+      },
+    },
+    // 기본 슬라이더 색상 변경
+    "& .MuiSlider-rail": {
+      backgroundColor: "#F7EEE2", // 기본 색상으로 변경
+    },
+  }));
+
   const appendMessage = (content, isUser, audioUrl) => {
     setMessages((prevMessages) => [
       ...prevMessages,
@@ -51,13 +71,11 @@ function Popup() {
   };
 
   //음성 답변 크기, 속도 조절하기
-  const handleVolumeChange = (newValue) => {
-    console.log("volume change", newValue);
+  const handleVolumeChange = (event, newValue) => {
     setAudioVolume(newValue);
   };
 
-  const handleSpeedChange = (newValue) => {
-    console.log("speed change", newValue);
+  const handleSpeedChange = (event, newValue) => {
     setAudioSpeed(newValue);
   };
 
@@ -300,12 +318,10 @@ function Popup() {
                     <Typography id="audio-volume-slider" gutterBottom>
                       음성 답변 소리 조절
                     </Typography>
-                    <Slider
-                      //value={audioVolume}
-                      // onChange={handleVolumeChange}
+                    <BrownSlider
+                      value={audioVolume}
+                      onChange={handleVolumeChange}
                       aria-labelledby="audio-volume-slider"
-                      defaultValue={0}
-                      getAriaValueText={handleVolumeChange}
                       valueLabelDisplay="auto"
                       step={3}
                       marks
@@ -317,12 +333,10 @@ function Popup() {
                     <Typography id="audio-speed-slider" gutterBottom>
                       음성 답변 속도 조절
                     </Typography>
-                    <Slider
-                      //value={audioSpeed}
-                      // onChange={handleSpeedChange}
+                    <BrownSlider
+                      value={audioSpeed}
+                      onChange={handleSpeedChange}
                       aria-labelledby="audio-speed-slider"
-                      defaultValue={1.25}
-                      getAriaValueText={handleSpeedChange}
                       valueLabelDisplay="auto"
                       step={0.25}
                       marks
