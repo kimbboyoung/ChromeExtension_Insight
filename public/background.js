@@ -1,5 +1,8 @@
 // 크롤링 작업을 시작하는 메시지를 받는 코드
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  const extensionURL = chrome.runtime.getURL("popup.html");
+  chrome.tabs.create({ url: extensionURL });
+  chrome.runtime.sendMessage({ type: "ocrInProgress" }); //OCR시작을 알림
   let formattedSrcList = [];
   if (request.coupangs.length > 0) {
     const coupangs = request.coupangs;
@@ -19,7 +22,6 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   //console.log("백그라운드 스크립트 이미지 URL 목록:", formattedSrcList);
   //console.log("백그라운드에서 현재 url : ", request.currentURL);
   if (formattedSrcList.length > 0) {
-    chrome.runtime.sendMessage({ type: "ocrInProgress" }); //OCR시작을 알림
     try {
       const response = await fetch("http://localhost:8000/pic_to_text", {
         method: "POST",
