@@ -1,7 +1,7 @@
 // 크롤링 작업을 시작하는 메시지를 받는 코드
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  const extensionURL = chrome.runtime.getURL("popup.html");
-  chrome.tabs.create({ url: extensionURL });
+  // const extensionURL = chrome.runtime.getURL("popup.html");
+  // chrome.tabs.create({ url: extensionURL });
   chrome.runtime.sendMessage({ type: "ocrInProgress" }); //OCR시작을 알림
   let formattedSrcList = [];
   if (request.coupangs.length > 0) {
