@@ -65,7 +65,6 @@ function Popup() {
         if (waitnotificationSound) {
           // OCR 시작 사운드를 중지하고 제거
           waitnotificationSound.pause();
-          waitnotificationSound = null;
         }
         notificationSound = new Audio("20231016064020111.mp3");
         notificationSound.play();
@@ -76,11 +75,9 @@ function Popup() {
     return () => {
       if (waitnotificationSound) {
         waitnotificationSound.pause();
-        waitnotificationSound = null;
       }
       if (notificationSound) {
         notificationSound.pause();
-        notificationSound = null;
       }
     };
   }, []);
@@ -367,6 +364,9 @@ function Popup() {
             {loading ? ( // 사용자 메시지일 때만 로딩 표시
               <div className="loader">
                 <BeatLoader color="#ffffff" loading={loading} />
+                <audio controls autoPlay loop>
+                  <source src="loadingSound.mp3" type="audio/mpeg" />
+                </audio>
               </div>
             ) : null}
           </div>

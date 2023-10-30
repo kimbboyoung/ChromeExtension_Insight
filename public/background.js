@@ -1,7 +1,34 @@
+// Allows users to open the side panel by clicking on the action toolbar icon
+chrome.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error(error));
+
+chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+  if (!tab.url) return;
+  const url = new URL(tab.url);
+  if (
+    (url.origin === "https://item.gmarket.co.kr" &&
+      url.pathname.match(/^\/item?.*/)) ||
+    (url.origin === "https://item.gmarket.co.kr" &&
+      url.pathname.match(/^\/Item?.*/)) ||
+    (url.origin === "https://www.coupang.com" &&
+      url.pathname.match(/^\/vp\/products\/.*/))
+  ) {
+    await chrome.sidePanel.setOptions({
+      tabId,
+      path: "popup.html",
+      enabled: true,
+    });
+  } else {
+    // Disables the side panel on all other sites
+    await chrome.sidePanel.setOptions({
+      tabId,
+      enabled: false,
+    });
+  }
+});
 // 크롤링 작업을 시작하는 메시지를 받는 코드
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  // const extensionURL = chrome.runtime.getURL("popup.html");
-  // chrome.tabs.create({ url: extensionURL });
   chrome.runtime.sendMessage({ type: "ocrInProgress" }); //OCR시작을 알림
   let formattedSrcList = [];
   if (request.coupangs.length > 0) {
@@ -44,36 +71,5 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     }
   } else {
     console.log("가져올 리스트가 없습니다.");
-  }
-
-  console.log("크롤링이 시작되었습니다.");
-});
-
-chrome.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((error) => console.error(error));
-
-chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
-  if (!tab.url) return;
-  const url = new URL(tab.url);
-  // 특정 링크에서만 실행하도록 확인
-  if (
-    (url.origin === "https://item.gmarket.co.kr" &&
-      url.pathname.match(/^\/Item?.*/)) ||
-    (url.origin === "https://www.coupang.com" &&
-      url.pathname.match(/^\/vp\/products\/.*/))
-  ) {
-    // sidePanel을 활성화
-    await chrome.sidePanel.setOptions({
-      tabId,
-      path: "popup.html",
-      enabled: true,
-    });
-  } else {
-    // 특정 페이지가 아닌 경우 패널을 비활성화
-    await chrome.sidePanel.setOptions({
-      tabId,
-      enabled: false,
-    });
   }
 });
