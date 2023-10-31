@@ -50,6 +50,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   //console.log("백그라운드에서 현재 url : ", request.currentURL);
   if (formattedSrcList.length > 0) {
     try {
+      console.log("텍스트 정보 : ", request.detailTexts);
       const response = await fetch("http://localhost:8000/pic_to_text", {
         method: "POST",
         headers: {
