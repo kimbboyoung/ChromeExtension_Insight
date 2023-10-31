@@ -1,5 +1,4 @@
-// 백그라운드 스크립트에서 이미지 URL 목록을 수신
-// const GOOGLE_ORIGIN = "https://item.gmarket.co.kr/*";
+// Allows users to open the side panel by clicking on the action toolbar icon
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error));
@@ -7,23 +6,30 @@ chrome.sidePanel
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (!tab.url) return;
   const url = new URL(tab.url);
-  // Enables the side panel on google.com
-  // if (url.origin === GOOGLE_ORIGIN) {
-  await chrome.sidePanel.setOptions({
-    tabId,
-    path: "popup.html",
-    enabled: true,
-  });
-  // } else {
-  // Disables the side panel on all other sites
-  // await chrome.sidePanel.setOptions({
-  //   tabId,
-  //   enabled: false,
-  // });
-  // }
+  if (
+    (url.origin === "https://item.gmarket.co.kr" &&
+      url.pathname.match(/^\/item?.*/)) ||
+    (url.origin === "https://item.gmarket.co.kr" &&
+      url.pathname.match(/^\/Item?.*/)) ||
+    (url.origin === "https://www.coupang.com" &&
+      url.pathname.match(/^\/vp\/products\/.*/))
+  ) {
+    await chrome.sidePanel.setOptions({
+      tabId,
+      path: "popup.html",
+      enabled: true,
+    });
+  } else {
+    // Disables the side panel on all other sites
+    await chrome.sidePanel.setOptions({
+      tabId,
+      enabled: false,
+    });
+  }
 });
-
+// 크롤링 작업을 시작하는 메시지를 받는 코드
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  chrome.runtime.sendMessage({ type: "ocrInProgress" }); //OCR시작을 알림
   let formattedSrcList = [];
   if (request.coupangs.length > 0) {
     const coupangs = request.coupangs;
@@ -43,7 +49,6 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   //console.log("백그라운드 스크립트 이미지 URL 목록:", formattedSrcList);
   //console.log("백그라운드에서 현재 url : ", request.currentURL);
   if (formattedSrcList.length > 0) {
-    chrome.runtime.sendMessage({ type: "ocrInProgress" }); //OCR시작을 알림
     try {
       console.log("텍스트 정보 : ", request.detailTexts);
       const response = await fetch("http://localhost:8000/pic_to_text", {

@@ -7,19 +7,22 @@
     "default_path": "popup.html"
   },
   "action": {
-    "default_title": "Click to open panel"
+    "default_title": "Open the extension",
+    "default_icon": "icon.png",
+    "type": "browser_action"
   },
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": [
-    "storage",
-    "tabs",
-    "activeTab",
-    "storage",
-    "webNavigation",
-    "sidePanel"
-  ],
+  "permissions": ["tabs", "activeTab", "storage", "webNavigation", "sidePanel"],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F"
+      },
+      "description": "Opens popup.html"
+    }
+  },
   "content_scripts": [
     {
       "matches": [

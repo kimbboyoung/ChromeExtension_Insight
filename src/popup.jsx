@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { alpha, styled, withStyles } from "@mui/material/styles";
 import { brown } from "@mui/material/colors"; // 갈색색상 추가
+import { BeatLoader, GridLoader } from "react-spinners";
 
 function Popup() {
   const [audioChunks, setAudioChunks] = useState([]);
@@ -23,6 +24,7 @@ function Popup() {
   const [audioSpeed, setAudioSpeed] = useState(1.25); // 초기값으로 1 설정
   const [isOcrInProgress, setIsOcrInProgress] = useState(false);
   const [ocrCompleted, setOcrCompleted] = useState(false);
+  const [loading, setLoading] = useState(false); // 로딩 상태를 관리하는 state
   //답변 보낼 때 보낼 url
   const [currentUrl, setCurrentUrl] = useState("");
   const toggleSettings = () => {
@@ -81,18 +83,35 @@ function Popup() {
 
   //OCR시작시 알림음실행
   useEffect(() => {
+    let waitnotificationSound = null;
+    let notificationSound = null;
+
     chrome.runtime.onMessage.addListener((message) => {
       if (message.type === "ocrInProgress") {
         setIsOcrInProgress(true);
-        const waitnotificationSound = new Audio("OCR_start.mp3");
+        waitnotificationSound = new Audio("OCR_start.mp3");
         waitnotificationSound.play();
       } else if (message.type === "ocrCompleted") {
         setIsOcrInProgress(false);
         setOcrCompleted(true);
-        const notificationSound = new Audio("20231016064020111.mp3");
+        if (waitnotificationSound) {
+          // OCR 시작 사운드를 중지하고 제거
+          waitnotificationSound.pause();
+        }
+        notificationSound = new Audio("20231016064020111.mp3");
         notificationSound.play();
       }
     });
+
+    // 컴포넌트가 언마운트되면 사운드 관련 리소스 정리
+    return () => {
+      if (waitnotificationSound) {
+        waitnotificationSound.pause();
+      }
+      if (notificationSound) {
+        notificationSound.pause();
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -103,21 +122,13 @@ function Popup() {
     });
   }, []);
 
-  //OCR완료시 알림음실행
-  // useEffect(() => {
-  //   if (ocrCompleted) {
-  //     const notificationSound = new Audio("20231016064020111.mp3");
-  //     notificationSound.play();
-  //   }
-  // }, [ocrCompleted]);
-
   const handleSendButtonClick = async () => {
     setMessages([]); // 메시지 목록 초기화
     if (userInput.trim() === "") return;
-
+    setUserInput(""); // 검색 후 userInput 비우기
     // Append user message to messages
     appendMessage(userInput, true);
-
+    setLoading(true);
     try {
       // const chatResponse = await fetch("http://localhost:8000/chat", {
       const chatResponse = await fetch("http://localhost:8000/answer", {
@@ -132,6 +143,7 @@ function Popup() {
 
       // 구글 tts
       const ttsURL = await fetchTextToSpeech(assistantTurn.content, userInput);
+      setLoading(false);
       appendMessage(assistantTurn.content, false, ttsURL);
     } catch (error) {
       console.error("에러 발생:", error);
@@ -199,7 +211,7 @@ function Popup() {
       const text = data.text;
 
       appendMessage(text, true);
-
+      setLoading(true);
       const chatResponse = await fetch("http://localhost:8000/answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -211,6 +223,7 @@ function Popup() {
       const assistantTurn = await chatResponse.json();
       // Fetch and play audio
       const ttsURL = await fetchTextToSpeech(assistantTurn.content, "");
+      setLoading(false);
       appendMessage(assistantTurn.content, false, ttsURL);
     } catch (error) {
       console.error("Error:", error);
@@ -258,12 +271,16 @@ function Popup() {
       setUserInput(""); // 검색 후 userInput 비우기
     }
   };
-
   return (
     <div id="chat-container">
       {isOcrInProgress && !ocrCompleted && (
         <div>
-          <h2>이미지를 분석 중입니다. 잠시만 기다려주세요.</h2>
+          <h2>이미지를 분석 중입니다.</h2>
+          <h2>잠시만 기다려주세요.</h2>
+          <h2> </h2>
+          <div className="loader-container">
+            <GridLoader color="#ffffff" margin={6} size={20} />
+          </div>
         </div>
       )}
       {ocrCompleted && (
@@ -371,6 +388,14 @@ function Popup() {
                 </span>
               </div>
             ))}
+            {loading ? ( // 사용자 메시지일 때만 로딩 표시
+              <div className="loader">
+                <BeatLoader color="#ffffff" loading={loading} />
+                <audio controls autoPlay loop>
+                  <source src="loadingSound.mp3" type="audio/mpeg" />
+                </audio>
+              </div>
+            ) : null}
           </div>
         </div>
       )}
