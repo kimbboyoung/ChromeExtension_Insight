@@ -19,24 +19,32 @@ const getAllCoupangImages = () => {
   if (itemTopInfo) {
     //상품 제목
     const h1Element = itemTopInfo.querySelector("h1");
-    const h1Text = h1Element.textContent.trim();
+    let h1Text = "";
+    if (h1Element) {
+      h1Text = h1Element.textContent.trim().replace(/\t/g, "");
+    }
 
     //원산지
-    const itemMade = itemTopInfo
-      .querySelector(".box__item-made")
-      .textContent.trim();
-    console.log("원산지 : ", itemMade);
+    const itemInfo = itemTopInfo.querySelector(".box__item-made");
+    let itemMade = "";
+    if (itemInfo) {
+      itemMade = itemInfo.textContent.trim().replace(/\t/g, "");
+    }
 
     //가격 정보
     const priceTextArray = [];
     const priceDivs = itemTopInfo.querySelector(".price"); // "price" 클래스를 가진 div 요소들 선택
-    const priceSubElements = priceDivs.querySelectorAll("span"); // 해당 div의 모든 하위 태그 선택
-    priceSubElements.forEach((subElement) => {
-      const text = subElement.textContent.trim(); // 각 하위 태그의 텍스트 추출하고 공백 제거
-      priceTextArray.push(text);
-    });
-    const priceTexts = priceTextArray.join(" ").trim();
-    //console.log("Price Texts:", priceTexts);
+    let priceTexts = "";
+    if (priceDivs) {
+      const priceSubElements = priceDivs.querySelectorAll("span"); // 해당 div의 모든 하위 태그 선택
+      if (priceSubElements) {
+        priceSubElements.forEach((subElement) => {
+          const text = subElement.textContent.trim().replace(/\t/g, ""); // 각 하위 태그의 텍스트 추출하고 공백 제거
+          priceTextArray.push(text);
+        });
+        priceTexts = priceTextArray.join(" ").trim().replace(/\t/g, "");
+      }
+    }
 
     //배송 정보
     const shipTextArray = [];
@@ -45,12 +53,12 @@ const getAllCoupangImages = () => {
     shippingFeeElements.forEach((shippingFeeElement) => {
       const shippingInforms = shippingFeeElement.querySelectorAll("span");
       shippingInforms.forEach((subElement) => {
-        const text = subElement.textContent.trim(); // 각 하위 태그의 텍스트 추출하고 공백 제거
+        const text = subElement.textContent.trim().replace(/\t/g, ""); // 각 하위 태그의 텍스트 추출하고 공백 제거
         shipTextArray.push(text);
       });
     });
 
-    const shippingTexts = shipTextArray.join(" ").trim();
+    const shippingTexts = shipTextArray.join(" ").trim().replace(/\t/g, "");
     //console.log("shippingTexts:", shippingTexts);
 
     // 텍스트를 줄바꿈 문자('\n')로 연결
@@ -93,7 +101,7 @@ const getAllCoupangImages = () => {
 
             const textsInIframe = basicDetailHtmlElement.querySelectorAll("P");
             textsInIframe.forEach((text) => {
-              combinedText += text.textContent.trim();
+              combinedText += text.textContent.trim().replace(/\t/g, "");
             });
             // 작업이 완료되면 반복문 종료
             break;
@@ -128,31 +136,46 @@ const getAllCoupangImages = () => {
         console.warn("Error accessing iframe contents:", e);
       }
     });
-    // 1. "prod-buy" 태그 선택
     const prodBuyElement = document.querySelector(".prod-buy");
 
     if (prodBuyElement) {
-      // 2. h2 태그 내의 텍스트 추출
       const h2Element = prodBuyElement.querySelector("h2");
-      const h2Text = h2Element.textContent.trim();
-
-      // 3. "total-price", "prod-shipping-fee-message", "prod-reward-cash-container" 클래스를 가진 하위 요소 선택
+      console.log("h2Element : ", h2Element);
+      let h2Text = "";
+      if (h2Element) {
+        console.log("h2Element.textContent : ", h2Element.textContent.trim());
+        h2Text = h2Element.textContent.trim().replace(/\t/g, "");
+      }
       const totalPriceElement = prodBuyElement.querySelector(".total-price");
+      let totalPriceText = "";
+      if (totalPriceElement) {
+        totalPriceText = totalPriceElement.textContent
+          .trim()
+          .replace(/\t/g, "");
+      }
       const shippingFeeElement = prodBuyElement.querySelector(
         ".prod-shipping-fee-message"
       );
+      let shippingFeeText = "";
+      if (shippingFeeElement) {
+        shippingFeeText = shippingFeeElement.textContent
+          .trim()
+          .replace(/\t/g, "");
+      }
       const rewardCashContainerElement =
         prodBuyElement.querySelector(".prod-reward-cash");
-      const rewards = rewardCashContainerElement.querySelectorAll("p");
-      const rewardsTextArray = Array.from(rewards).map((reward) =>
-        reward.textContent.trim()
-      );
-      const combinedRewardsText = rewardsTextArray.join("\n");
+      let combinedRewardsText = "";
+      if (rewardCashContainerElement) {
+        const rewards = rewardCashContainerElement.querySelectorAll("p");
+        if (rewards) {
+          const rewardsTextArray = Array.from(rewards).map((reward) =>
+            reward.textContent.trim().replace(/\t/g, "")
+          );
+          combinedRewardsText = rewardsTextArray.join("\n");
+        }
+      }
 
       // 텍스트 추출
-      const totalPriceText = totalPriceElement.textContent.trim();
-      const shippingFeeText = shippingFeeElement.textContent.trim();
-      //const rewardCashText = combinedRewardsText.textContent.trim();
 
       // 텍스트를 줄바꿈 문자('\n')로 연결
       combinedText = [
@@ -160,13 +183,16 @@ const getAllCoupangImages = () => {
         totalPriceText,
         shippingFeeText,
         combinedRewardsText,
-      ].join("\n");
+      ]
+        .join("\n")
+        .replace(/\t/g, "");
       //console.log("combinedText:", combinedText);
     }
   }
 
   // 크롤링 데이터를 수집한 후 플래그를 설정
   dataCollected = true;
+  console.log("combinedText : ", combinedText);
 };
 
 // 현재 페이지의 URL 가져오기
