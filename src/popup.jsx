@@ -267,6 +267,9 @@ function Popup() {
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       e.preventDefault(); // 기본 엔터 동작 방지
+      if (e.nativeEvent.isComposing) {
+        return;
+      }
       handleSendButtonClick();
       setUserInput(""); // 검색 후 userInput 비우기
     }
