@@ -67,7 +67,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           console.log("OCR STATUS : ", response.statusText);
           chrome.runtime.sendMessage({
             type: "ocrCompleted",
-            currentUrl: request.currentURL,
+            currentURL: request.currentURL,
           });
         });
     } catch (error) {

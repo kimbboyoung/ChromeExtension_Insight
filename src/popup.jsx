@@ -116,8 +116,9 @@ function Popup() {
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener((message) => {
-      if (message.type === "ocrCompleted") {
-        console.log("여기요!!currentUrl :", message.currentUrl);
+      //console.log("message : ", message);
+      if (message.currentURL) {
+        //console.log("message.currentURL : ", message.currentURL);
         setCurrentUrl(message.currentURL);
       }
     });
