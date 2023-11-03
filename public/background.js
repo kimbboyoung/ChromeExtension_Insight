@@ -51,6 +51,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (formattedSrcList.length > 0) {
     try {
       console.log("텍스트 정보 : ", request.detailTexts);
+      console.log("backgound : ", request.currentURL);
       const response = await fetch("http://localhost:8000/pic_to_text", {
         method: "POST",
         headers: {
@@ -65,7 +66,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         //ocr완료 확인용
         .then((response) => {
           console.log("OCR STATUS : ", response.statusText);
-          chrome.runtime.sendMessage({ type: "ocrCompleted" });
+          chrome.runtime.sendMessage({
+            type: "ocrCompleted",
+            currentUrl: request.currentURL,
+          });
         });
     } catch (error) {
       console.error("POST 요청 전송 중 오류 발생:", error);

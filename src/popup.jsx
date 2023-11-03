@@ -115,9 +115,10 @@ function Popup() {
   }, []);
 
   useEffect(() => {
-    chrome.runtime.onMessage.addListener((url) => {
-      if (url.currentURL) {
-        setCurrentUrl(url?.currentURL);
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.type === "ocrCompleted") {
+        console.log("여기요!!currentUrl :", message.currentUrl);
+        setCurrentUrl(message.currentURL);
       }
     });
   }, []);
