@@ -30,23 +30,12 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   chrome.runtime.sendMessage({ type: "ocrInProgress" }); //OCR시작을 알림
   let formattedSrcList = [];
-  if (request.coupangs.length > 0) {
-    const coupangs = request.coupangs;
-    formattedSrcList = formattedSrcList.concat(
-      coupangs.map((url) => ({ url }))
-    );
-    console.log("쿠팡 이미지 URL 목록:", formattedSrcList);
-    console.log("백그라운드에서 현재 url : ", request.currentURL);
-    console.log("백그라운드에서 현재 productTexts : ", request.detailTexts);
-  }
 
-  if (request.images.length > 0) {
+  if (request.images && request.images.length > 0) {
     const srcList = request.images;
     formattedSrcList = formattedSrcList.concat(srcList.map((url) => ({ url })));
     console.log("Gmarket 이미지 URL 목록:", formattedSrcList);
   }
-  //console.log("백그라운드 스크립트 이미지 URL 목록:", formattedSrcList);
-  //console.log("백그라운드에서 현재 url : ", request.currentURL);
   if (formattedSrcList.length > 0) {
     try {
       console.log("텍스트 정보 : ", request.detailTexts);
@@ -64,6 +53,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       })
         //ocr완료 확인용
         .then((response) => {
+          console.log("response : ", response);
           console.log("OCR STATUS : ", response.statusText);
           chrome.runtime.sendMessage({
             type: "ocrCompleted",
@@ -77,3 +67,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     console.log("가져올 리스트가 없습니다.");
   }
 });
+
+// chrome.runtime.onMessage.addListener((message) => {
+//   console.log("$$$background message : ", message);
+// });

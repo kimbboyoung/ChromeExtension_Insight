@@ -27,6 +27,8 @@ function Popup() {
   const [loading, setLoading] = useState(false); // 로딩 상태를 관리하는 state
   //답변 보낼 때 보낼 url
   const [currentUrl, setCurrentUrl] = useState("");
+  const [imageUrls, setImageUrls] = useState([]);
+
   const toggleSettings = () => {
     setIsSettingsOpen((prevOpen) => !prevOpen);
   };
@@ -116,10 +118,13 @@ function Popup() {
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener((message) => {
-      //console.log("message : ", message);
+      console.log("popup.jsx message : ", message);
       if (message.currentURL) {
         //console.log("message.currentURL : ", message.currentURL);
         setCurrentUrl(message.currentURL);
+      }
+      if (message.images) {
+        setImageUrls(message.images);
       }
     });
   }, []);
@@ -147,6 +152,7 @@ function Popup() {
       const ttsURL = await fetchTextToSpeech(assistantTurn.content, userInput);
       setLoading(false);
       appendMessage(assistantTurn.content, false, ttsURL);
+      focusOnInformation();
     } catch (error) {
       console.error("에러 발생:", error);
     }
@@ -276,6 +282,13 @@ function Popup() {
       setUserInput(""); // 검색 후 userInput 비우기
     }
   };
+
+  const focusOnInformation = () => {
+    chrome.runtime.sendMessage({
+      searchImg: "이미지를 찾아보자!",
+    });
+  };
+  console.log("==========imageUrls: ", imageUrls);
   return (
     <div id="chat-container">
       {isOcrInProgress && !ocrCompleted && (
@@ -331,9 +344,9 @@ function Popup() {
                 name="toggle-switch"
                 inputProps={{ "aria-label": "toggle switch" }}
               />
-              <span id="settingIcon" onClick={toggleSettings}>
+              {/* <span id="settingIcon" onClick={toggleSettings}>
                 <img src="settingIcon.png" alt="음성 설정" />
-              </span>
+              </span> */}
               {isSettingsOpen && (
                 <div className="setting-container">
                   <div className="sound-controller">
