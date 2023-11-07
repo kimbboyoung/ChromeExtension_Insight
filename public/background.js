@@ -30,20 +30,20 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   chrome.runtime.sendMessage({ type: "ocrInProgress" }); //OCR시작을 알림
   let formattedSrcList = [];
-  if (request.coupangs.length > 0) {
-    const coupangs = request.coupangs;
-    formattedSrcList = formattedSrcList.concat(
-      coupangs.map((url) => ({ url }))
-    );
-    console.log("쿠팡 이미지 URL 목록:", formattedSrcList);
-    console.log("백그라운드에서 현재 url : ", request.currentURL);
-    console.log("백그라운드에서 현재 productTexts : ", request.detailTexts);
-  }
-
+  // if (request.coupangs.length > 0) {
+  //   const coupangs = request.coupangs;
+  //   formattedSrcList = formattedSrcList.concat(
+  //     coupangs.map((url) => ({ url }))
+  //   );
+  //   console.log("쿠팡 이미지 URL 목록:", formattedSrcList);
+  //   console.log("백그라운드에서 현재 url : ", request.currentURL);
+  //   console.log("백그라운드에서 현재 productTexts : ", request.detailTexts);
+  // }
+  console.log("backgroun.js request : ", request);
   if (request.images.length > 0) {
     const srcList = request.images;
     formattedSrcList = formattedSrcList.concat(srcList.map((url) => ({ url })));
-    console.log("Gmarket 이미지 URL 목록:", formattedSrcList);
+    console.log("이미지 URL 목록:", formattedSrcList);
   }
   //console.log("백그라운드 스크립트 이미지 URL 목록:", formattedSrcList);
   //console.log("백그라운드에서 현재 url : ", request.currentURL);

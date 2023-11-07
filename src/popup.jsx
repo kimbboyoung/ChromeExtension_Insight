@@ -117,7 +117,7 @@ function Popup() {
   useEffect(() => {
     chrome.runtime.onMessage.addListener((message) => {
       //console.log("message : ", message);
-      if (message.currentURL) {
+      if (message.type === "ocrCompleted" && message.currentURL) {
         //console.log("message.currentURL : ", message.currentURL);
         setCurrentUrl(message.currentURL);
       }
